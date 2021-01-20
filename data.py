@@ -51,6 +51,7 @@ simple_datasets_info = [
     ),
 ]
 
+
 class CreditCardFraudDetectionKaggleDataset:
     @property
     def name(self):
@@ -107,8 +108,8 @@ kaggle_datasets = [
 def prepare_datasets(dirname=DATASETS_DIR):
     preare_simple_datasets(simple_datasets_info, dirname)
     prepare_kaggle_datasets(kaggle_datasets, dirname)
-    preprocessing_1()
-    preprocessing_2()
+    preprocessing_ecoli()
+    preprocessing_german()
 
 
 def preare_simple_datasets(datasets_info, dirname):
@@ -134,19 +135,49 @@ def main():
 def get_datasets_files():
     return [os.path.join(DATASETS_DIR, file) for file in os.listdir(DATASETS_DIR)]
 
-def preprocessing_1():
-    df = pd.read_csv('datasets/ecoli.csv', header=None)
-    df.rename(columns={0: 'id0', 1: 'id1', 2: 'id2', 3: 'id3', 4: 'id4', 5: 'id5', 6: 'id6', 7: 'id7',  }, inplace=True)
-    df.to_csv('datasets/ecoli.csv', index=False)
-    le = preprocessing.LabelEncoder()
-    df['id7'] = le.fit_transform(df['id7'])
-    df.to_csv('datasets/ecoli.csv', index=False)
 
-def preprocessing_2():
-    df2 = pd.read_csv('datasets/german.csv', header=None)
-    df2 = df2.astype(str)
-    df2 = df2.replace('A', '', regex=True)
-    df2.to_csv('datasets/german.csv', index=False)
+def preprocessing_ecoli():
+    df = pd.read_csv("datasets/ecoli.csv", header=None)
+    df.rename(
+        columns={
+            0: "id0",
+            1: "id1",
+            2: "id2",
+            3: "id3",
+            4: "id4",
+            5: "id5",
+            6: "id6",
+            7: "id7",
+        },
+        inplace=True,
+    )
+    df.to_csv("datasets/ecoli.csv", index=False)
+    le = preprocessing.LabelEncoder()
+    df["id7"] = le.fit_transform(df["id7"])
+    df.to_csv("datasets/ecoli.csv", index=False)
+
+
+def preprocessing_german():
+    def to_numbers():
+        df2 = pd.read_csv("datasets/german.csv", header=None)
+        df2 = df2.astype(str)
+        df2 = df2.replace("A", "", regex=True)
+        df2.to_csv("datasets/german.csv", index=False)
+
+    def fix_classes():
+        df2 = pd.read_csv("datasets/german.csv")
+        df2["20"] = df2["20"].apply(lambda x: x + 1)
+        df2.to_csv("datasets/german.csv", index=False)
+
+    to_numbers()
+    fix_classes()
+
+
+def preprocessing_porto():
+    df = pd.read_csv("datasets/porto-seguro-safe-driver-prediction.csv")
+    df.dropna(inplace=True)
+    df.to_csv("datasets/porto-seguro-safe-driver-prediction.csv", index=False)
+
 
 if __name__ == "__main__":
-    main()
+    preprocessing_german()
