@@ -51,7 +51,23 @@ simple_datasets_info = [
     ),
 ]
 
-class CreditCardFraudDetectionKaggleDataset:
+class DatasetInterface:
+    @property
+    def name(self) -> str:
+        """
+        should return name of dataset
+        """
+        raise NotImplementedError
+
+    def prepare(self, dirname: str):
+        """
+        should fetch and prepare data
+        Args:
+            dirname (str): dir where dataset csv should be saved
+        """
+        raise NotImplementedError
+
+class CreditCardFraudDetectionKaggleDataset(DatasetInterface):
     @property
     def name(self):
         return "Credit Card Fraud Detection"
@@ -65,7 +81,7 @@ class CreditCardFraudDetectionKaggleDataset:
         subprocess.run(["rm", "creditcardfraud.zip"])
 
 
-class PortoSegurosSafeDriverPredictionKaggleDataset:
+class PortoSegurosSafeDriverPredictionKaggleDataset(DatasetInterface):
     @property
     def name(self):
         return "Porto Seguro’s Safe Driver Prediction"
