@@ -49,6 +49,46 @@ simple_datasets_info = [
         target_filename="new-thyroid.csv",
         csv_url="https://raw.githubusercontent.com/jbrownlee/Datasets/master/new-thyroid.csv",
     ),
+    SimpleCsvDatasetInfo(
+        name="Iris",
+        target_filename="Iris.csv",
+        csv_url="https://raw.githubusercontent.com/Student235555/some-datasets/master/datasets/Iris.csv",
+    ),
+    SimpleCsvDatasetInfo(
+        name="Abalone",
+        target_filename="abalone.csv",
+        csv_url="https://raw.githubusercontent.com/Student235555/some-datasets/master/datasets/abalone.csv",
+    ),
+    SimpleCsvDatasetInfo(
+        name="banknote",
+        target_filename="banknote.csv",
+        csv_url="https://raw.githubusercontent.com/Student235555/some-datasets/master/datasets/banknote.csv",
+    ),
+    SimpleCsvDatasetInfo(
+        name="breast-cancer-wisconsin",
+        target_filename="breast-cancer-wisconsin.csv",
+        csv_url="https://raw.githubusercontent.com/Student235555/some-datasets/master/datasets/breast-cancer-wisconsin.csv",
+    ),
+    SimpleCsvDatasetInfo(
+        name="cleveland",
+        target_filename="cleveland.csv",
+        csv_url="https://raw.githubusercontent.com/Student235555/some-datasets/master/datasets/cleveland.csv",
+    ),
+    SimpleCsvDatasetInfo(
+        name="heart",
+        target_filename="heart.csv",
+        csv_url="https://raw.githubusercontent.com/Student235555/some-datasets/master/datasets/heart.csv",
+    ),
+    SimpleCsvDatasetInfo(
+        name="sonar",
+        target_filename="sonar.csv",
+        csv_url="https://raw.githubusercontent.com/Student235555/some-datasets/master/datasets/sonar.csv",
+    ),
+    SimpleCsvDatasetInfo(
+        name="wine",
+        target_filename="wine.csv",
+        csv_url="https://raw.githubusercontent.com/Student235555/some-datasets/master/datasets/wine.csv",
+    ),
 ]
 
 
