@@ -5,40 +5,32 @@ from sklearn.ensemble import (
     RandomForestClassifier,
     AdaBoostClassifier,
     GradientBoostingClassifier,
+    ExtraTreesClassifier,
 )
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import RepeatedStratifiedKFold, cross_val_score
 import xgboost as xgb
 import pandas as pd
 import numpy as np
 
-from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import EditedNearestNeighbours
-from imblearn.pipeline import make_pipeline
 
 from tabulate import tabulate
 
 from data import get_datasets_files
 
-baggin_vs_boosting_models = {
+models = {
     "XGBClassifier": xgb.XGBClassifier(n_jobs=4, verbosity=0),
     "RandomForestClassifier": RandomForestClassifier(),
     "AdaBoostClassifier": AdaBoostClassifier(),
     "GradientBoostingClassifier": GradientBoostingClassifier(),
+    "DecisionTreeClassifier": DecisionTreeClassifier(),
+    "ExtraTreesClassifier": ExtraTreesClassifier(),
 }
 
-data_transoforms_models = {
-    "RandomForestClassifier + SMOTE": make_pipeline(
-        SMOTE(k_neighbors=3), RandomForestClassifier()
-    ),
-    "RandomForestClassifier + ENN": make_pipeline(
-        EditedNearestNeighbours(), RandomForestClassifier()
-    ),
-}
 
 
 def main():
     print(get_datasets_files())
-    models = {**baggin_vs_boosting_models, **data_transoforms_models}
     print(models)
     r = run_exp(models, get_datasets_files())
     print_and_save_result("results", r, models)

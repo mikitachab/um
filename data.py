@@ -164,7 +164,7 @@ kaggle_datasets = [
 
 def prepare_datasets(dirname=DATASETS_DIR):
     preare_simple_datasets(simple_datasets_info, dirname)
-    prepare_kaggle_datasets(kaggle_datasets, dirname)
+#    prepare_kaggle_datasets(kaggle_datasets, dirname)
     preprocessing_ecoli()
     preprocessing_german()
 
@@ -237,4 +237,4 @@ def preprocessing_porto():
 
 
 if __name__ == "__main__":
-    preprocessing_german()
+    main()
