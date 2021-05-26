@@ -1,4 +1,5 @@
 import json
+import warnings
 
 from numpy.lib.function_base import append
 from sklearn.ensemble import (
@@ -12,21 +13,22 @@ from sklearn.model_selection import RepeatedStratifiedKFold, cross_val_score
 import xgboost as xgb
 import pandas as pd
 import numpy as np
-
-
+from scipy import stats
 from tabulate import tabulate
 
 from data import get_datasets_files
 
+warnings.filterwarnings("ignore")
+
+
 models = {
-    "XGBClassifier": xgb.XGBClassifier(n_jobs=4, verbosity=0),
+    "XGBClassifier": xgb.XGBClassifier(n_jobs=4, verbosity=0, silent=True),
     "RandomForestClassifier": RandomForestClassifier(),
     "AdaBoostClassifier": AdaBoostClassifier(),
     "GradientBoostingClassifier": GradientBoostingClassifier(),
     "DecisionTreeClassifier": DecisionTreeClassifier(),
     "ExtraTreesClassifier": ExtraTreesClassifier(),
 }
-
 
 
 def main():
@@ -60,33 +62,62 @@ def run_exp(models, datasets):
     return final_scores
 
 
+def make_table(results, models, t_tests):
+    records = []
+    for dataset_name, result in results.items():
+        dataset_t_tests = t_tests[dataset_name]
+        record = [dataset_name]
+        for model in models:
+            val = str(round(np.mean(result[model]), 3))
+            t = ",".join(str(x) for x in dataset_t_tests[model])
+            record.append(f"{val}\n{t}")
+        records.append(record)
+    return tabulate(
+        records,
+        headers=["dataset"] + list(models.keys()),
+        numalign="center",
+        stralign="center",
+        tablefmt="grid",
+    )
+
+
+def save_result(name, table):
+    with open(name + ".txt", "w") as file:
+        file.write(table)
+
+
+def save_cv_results(name, results):
+    data = {
+        dataset: {model: list(cv_scores) for model, cv_scores in scores.items()}
+        for dataset, scores in results.items()
+    }
+    with open(name + ".json", "w") as file:
+        json.dump(data, file, indent=2)
+
+
 def print_and_save_result(result_name, results, models):
-    def make_table(results, models):
-        records = []
-        for dataset_name, result in results.items():
-            record = [dataset_name]
-            for model in models:
-                record.append(np.mean(result[model]))
-            records.append(record)
-        return tabulate(records, headers=["dataset"] + list(models.keys()))
-
-    def save_result(table):
-        with open(result_name + ".txt", "w") as file:
-            file.write(table)
-
-    def save_cv_results():
-        data = {
-            dataset: {model: list(cv_scores) for model, cv_scores in scores.items()}
-            for dataset, scores in results.items()
-        }
-        with open(result_name + ".json", "w") as file:
-            json.dump(data, file, indent=2)
-
-    table = make_table(results, models)
+    datasets = list(results.keys())
+    t_tests = make_t_tests(results, models, datasets)
+    table = make_table(results, models, t_tests)
     print(result_name)
     print(table)
-    save_result(table)
-    save_cv_results()
+    save_result(result_name, table)
+    save_cv_results(result_name, results)
+
+
+def make_t_tests(cv_results, models, datasets):
+    results = {}
+    for dataset in datasets:
+        dataset_data = cv_results[dataset]
+        results[dataset] = {}
+        for model_a in models:
+            results[dataset][model_a] = []
+            for i, model_b in enumerate(models, 1):
+                if model_a != model_b:
+                    t, a = stats.ttest_ind(dataset_data[model_a], dataset_data[model_b])
+                    if a <= 0.05 and t > 0:
+                        results[dataset][model_a].append(i)
+    return results
 
 
 if __name__ == "__main__":
