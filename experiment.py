@@ -30,12 +30,49 @@ models = {
     "ExtraTreesClassifier": ExtraTreesClassifier(),
 }
 
+alfa = 0.05
 
 def main():
     print(get_datasets_files())
     print(models)
     r = run_exp(models, get_datasets_files())
     print_and_save_result("results", r, models)
+    print("Wilcoxon's rank tests")
+    wilcoxons_tests(r)
+
+
+def wilcoxons_tests(results):
+    models_l = list(models.keys())
+    ranks = []
+    for dataset, models_results in results.items():
+        means = []
+        for model in models_l:
+            means.append(np.mean(models_results[model]))
+        ranks.append(stats.rankdata(means))
+    ranks = np.array(ranks).T
+    print(ranks)
+    w_statistic = np.zeros((len(models_l), len(models_l)))
+    p_value = np.zeros((len(models_l), len(models_l)))
+
+    for i in range(len(models_l)):
+        for j in range(len(models_l)):
+            w_statistic[i, j], p_value[i, j] = stats.ranksums(ranks[i], ranks[j])
+
+
+    advantage = np.zeros((len(models_l), len(models_l)))
+    advantage[w_statistic > 0] = 1
+    significance = np.zeros((len(models_l), len(models_l)))
+    significance[p_value <= alfa] = 1
+
+    print("advantage")
+    names_column = np.expand_dims(np.array(list(models_l)), axis=1)
+    table = tabulate(np.concatenate((names_column, advantage), axis=1), headers=models_l, numalign="center")
+    print(table)
+
+    print("significance")
+    names_column = np.expand_dims(np.array(list(models_l)), axis=1)
+    table = tabulate(np.concatenate((names_column, significance), axis=1), headers=models_l, numalign="center")
+    print(table)
 
 
 def get_dataset_name(filename):
@@ -72,6 +109,7 @@ def make_table(results, models, t_tests):
             t = ",".join(str(x) for x in dataset_t_tests[model])
             record.append(f"{val}\n{t}")
         records.append(record)
+
     return tabulate(
         records,
         headers=["dataset"] + list(models.keys()),
